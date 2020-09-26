@@ -1,0 +1,19 @@
+parameters:
+
+services:
+  Linio\Component\Database\DatabaseManager:
+    calls:
+      - method: addConnection
+        arguments:
+          - '%env(DB_DRIVER)%'
+          - host: '%env(DB_HOST)%'
+            port: '%env(DB_PORT)%'
+            dbname: '%env(DB_NAME)%'
+            username: '%env(DB_USERNAME)%'
+            password: '%env(DB_PASSWORD)%'
+            pdo_attributes:
+              '!php/const PDO::ATTR_ERRMODE': !php/const PDO::ERRMODE_EXCEPTION
+
+  App\Command\ImportProductsCommand:
+    tags:
+      - { name: 'console.command', command: 'import:products' }

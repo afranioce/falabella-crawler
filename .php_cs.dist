@@ -1,0 +1,27 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->exclude('vendor')
+    ->in(__DIR__)
+;
+
+$config = PhpCsFixer\Config::create()
+    ->setRiskyAllowed(true)
+    ->setRules([
+        '@PHP56Migration' => true,
+        '@PHPUnit60Migration:risky' => true,
+        '@PhpCsFixer' => true,
+        '@Symfony' => true,
+        '@PhpCsFixer:risky' => true,
+        'yoda_style' => true,
+        'declare_strict_types' => true,
+        'blank_line_before_return' => true,
+        'void_return' => true,
+        'return_type_declaration' => true,
+        'list_syntax' => ['syntax' => 'long'],
+        'php_unit_strict' => false
+    ])
+    ->setFinder($finder)
+;
+
+return $config;

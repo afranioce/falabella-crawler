@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+    restart: always
+    volumes:
+      - .:/app
+
+  database:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: hackaton
+      MYSQL_ROOT_PASSWORD: 34&$f*d974
+    ports:
+      - '3306:3306'
