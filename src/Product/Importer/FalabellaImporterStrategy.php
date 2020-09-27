@@ -51,28 +51,31 @@ class FalabellaImporterStrategy implements ImporterStrategyInterface
                 'image' => $product->getPhotos()[0] ?? null,
             ];
 
-            $lastInsertId = $this->db->execute('
+            $this->db->execute('
                 INSERT INTO `product` (`name`, `image`)
                 VALUES
                     (:name, :image)
             ', $params);
+
+            $lastInsertId = $this->db->getLastInsertId();
 
             foreach ($product->getOffers() as $offer) {
                 $params = [
                     'product_id' => $lastInsertId,
                     'seller_id' => $seller->getId(),
                     'name' => $offer->getName(),
-                    'sku' => $offer->getSku(),
                     'link' => $offer->getLink(),
+                    'sku' => $offer->getSku(),
                     'price' => $offer->getPrice(),
-                    'is_manually_reviewed' => $offer->isManualReviewed(),
-                    'created_at' => (new DateTime())->format(DateTime::ISO8601),
+                    'from_price' => '',
+                    'is_manually_reviewed' => (int) $offer->isManualReviewed(),
+                    'created_at' => (new DateTime())->format('Y-m-d H:i:s'),
                 ];
 
                 $this->db->execute('
-                INSERT INTO `offer` (`product_id`, `seller_id`, `name`, `link`, `price`, `from_price`, `sku`, `is_manually_reviewed`)
+                INSERT INTO `offer` (`product_id`, `seller_id`, `name`, `link`, `price`, `from_price`, `sku`, `is_manually_reviewed`, `created_at`)
                 VALUES
-                    (:product_id, :seller_id, :name, :link, :price, :from_price, :sku, :is_manually_reviewed)
+                    (:product_id, :seller_id, :name, :link, :price, :from_price, :sku, :is_manually_reviewed, :created_at)
             ', $params);
             }
         }

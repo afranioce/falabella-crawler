@@ -25,7 +25,11 @@ class CategoryPageCrawler extends AbstractCrawler
 
         $arrayData = $property->getValue();
 
-        return $this->getProducts($arrayData['props']['pageProps']['results']);
+        if (isset($arrayData['props']['pageProps']['results'])) {
+            return $this->getProducts($arrayData['props']['pageProps']['results']);
+        }
+
+        return [];
     }
 
     /**
@@ -37,8 +41,8 @@ class CategoryPageCrawler extends AbstractCrawler
             $products,
             fn ($product): Product => new Product(
                 $product['displayName'],
-                implode(PHP_EOL, $product['topSpecifications']),
-                $product['brand'],
+                implode(PHP_EOL, $product['topSpecifications'] ?? []),
+                $product['brand'] ?? '',
                 // TODO pegar as imagens
                 [''],
                 array_map(

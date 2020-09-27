@@ -26,6 +26,7 @@ class ImportProductsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $seller = new Seller(
+            1,
             SellerNames::FALABELLA_CHILE,
             'https://www.falabella.com/falabella-cl'
         );

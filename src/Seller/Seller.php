@@ -12,8 +12,9 @@ class Seller
 
     private string $homepage;
 
-    public function __construct(string $name, string $homepage)
+    public function __construct(int $id, string $name, string $homepage)
     {
+        $this->id = $id;
         $this->name = $name;
         $this->homepage = $homepage;
     }
