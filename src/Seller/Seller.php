@@ -6,6 +6,8 @@ namespace App\Seller;
 
 class Seller
 {
+    private int $id;
+
     private string $name;
 
     private string $homepage;
@@ -14,6 +16,11 @@ class Seller
     {
         $this->name = $name;
         $this->homepage = $homepage;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getName(): string

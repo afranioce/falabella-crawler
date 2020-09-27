@@ -8,17 +8,22 @@ use App\Product\Importer\ImporterFactory;
 use App\Seller\Seller;
 use App\Seller\SellerNames;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportProductsCommand extends Command
 {
+    protected static $defaultName = 'import:products';
+
     private ImporterFactory $importerFactory;
 
     public function __construct(ImporterFactory $importerFactory)
     {
         $this->importerFactory = $importerFactory;
+        parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $seller = new Seller(
             SellerNames::FALABELLA_CHILE,
@@ -27,6 +32,6 @@ class ImportProductsCommand extends Command
 
         $importer = $this->importerFactory->make($seller);
 
-        $importer->handler();
+        $importer->handler($seller);
     }
 }

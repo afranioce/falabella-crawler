@@ -9,20 +9,19 @@ use App\Seller\SellerNames;
 
 class ImporterFactory
 {
-    /** @var ImporterStrategyInterface[] */
-    private array $importers;
+    private FalabellaImporterStrategy $importer;
 
-    public function __construct(array $importers)
+    public function __construct(FalabellaImporterStrategy $importer)
     {
-        $this->importers = $importers;
+        $this->importer = $importer;
     }
 
     public function make(Seller $seller): ImporterStrategyInterface
     {
-        if (\in_array($seller->getName(), SellerNames::ALL, true)) {
+        if (!\in_array($seller->getName(), SellerNames::ALL, true)) {
             throw new \InvalidArgumentException(sprintf('Seller "%s" is invalid.', $seller->getName()));
         }
 
-        return $this->importers[$seller->getName()];
+        return $this->importer;
     }
 }

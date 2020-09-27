@@ -1,6 +1,15 @@
 parameters:
+  env(APP_ENV): dev
 
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  App\:
+    resource: "../src/*"
+    exclude: "../src/{Kernel.php}"
+
   Linio\Component\Database\DatabaseManager:
     calls:
       - method: addConnection
@@ -14,6 +23,14 @@ services:
             pdo_attributes:
               '!php/const PDO::ATTR_ERRMODE': !php/const PDO::ERRMODE_EXCEPTION
 
-  App\Command\ImportProductsCommand:
-    tags:
-      - { name: 'console.command', command: 'import:products' }
+  Crawler\Configuration:
+    arguments:
+      - types: { json: App\Crawler\CustomType\JsonType }
+
+  Crawler\DocumentBuilder:
+    arguments:
+      - '@Crawler\Configuration'
+
+  GuzzleHttp\Client: ~
+
+  GuzzleHttp\ClientInterface: '@GuzzleHttp\Client'

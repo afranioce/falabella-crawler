@@ -12,16 +12,20 @@ class Offer
 
     private float $price;
 
+    private string $sku;
+
     private bool $isManualReviewed = false;
 
     public function __construct(
         string $name,
         string $link,
-        float $price
+        float $price,
+        string $sku
     ) {
         $this->name = $name;
         $this->link = $link;
         $this->price = $price;
+        $this->sku = $sku;
     }
 
     public function getName(): string
@@ -42,5 +46,10 @@ class Offer
     public function isManualReviewed(): bool
     {
         return $this->isManualReviewed;
+    }
+
+    public function getSku(): string
+    {
+        return $this->sku;
     }
 }

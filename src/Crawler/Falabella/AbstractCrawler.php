@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Crawler\Falabella;
 
-use App\Seller\Seller;
 use Crawler\Document;
 use Crawler\DocumentBuilder;
+use GuzzleHttp\ClientInterface;
 
 abstract class AbstractCrawler
 {
     protected DocumentBuilder $documentBuilder;
-    private Seller $seller;
+    private ClientInterface $client;
 
-    public function __construct(Seller $seller, DocumentBuilder $documentBuilder)
+    public function __construct(ClientInterface $client, DocumentBuilder $documentBuilder)
     {
+        $this->client = $client;
         $this->documentBuilder = $documentBuilder;
-        $this->seller = $seller;
     }
 
     protected function getArrayData(array $data, \Closure $callback): array
@@ -30,8 +30,13 @@ abstract class AbstractCrawler
         return $result;
     }
 
-    protected function getDocument(string $path = ''): Document
+    protected function getDocument(string $baseUrl, string $path = ''): Document
     {
-        return $this->documentBuilder->createFromURL(sprintf('%s/%s', $this->seller->getHomePage(), $path));
+//        $response = $this->client->request('GET', sprintf('%s%s', $baseUrl, $path));
+//
+//        $html = $response->getBody()->getContents();
+//        return $this->documentBuilder->createFromHTML($html);
+
+        return $this->documentBuilder->createFromURL(sprintf('%s%s', $baseUrl, $path));
     }
 }

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Crawler\Falabella;
 
 use App\Crawler\CustomType\JsonType;
+use App\Seller\Seller;
 use Crawler\Property;
 
 class HomePageCrawler extends AbstractCrawler
 {
     private const CONTAINER_KEY_CATEGORY_MENU = 'header-med-categories-menu';
 
-    public function getCategoryPathsFromMainMenu(): array
+    private array $links = [];
+
+    public function getCategoryPathsFromMainMenu(Seller $seller): array
     {
-        $homeDocument = $this->getDocument();
+        $homeDocument = $this->getDocument($seller->getHomePage(), '');
 
         $property = new Property([
             'name' => 'menu',
@@ -31,7 +34,9 @@ class HomePageCrawler extends AbstractCrawler
     {
         foreach ($containers as $container) {
             if (self::CONTAINER_KEY_CATEGORY_MENU === $container['key']) {
-                return $this->getRootCategories($container['components'][0]['data']['rootCategories']);
+                $this->getRootCategories($container['components'][0]['data']['rootCategories']);
+
+                return $this->links;
             }
         }
     }
@@ -54,6 +59,6 @@ class HomePageCrawler extends AbstractCrawler
 
     private function getLeafCategories(array $leafCategories): array
     {
-        return $this->getArrayData($leafCategories, fn ($datum): string => $datum['link']);
+        return $this->getArrayData($leafCategories, fn ($datum): string => $this->links[] = $datum['link']);
     }
 }
