@@ -35,7 +35,7 @@
       "@lint:check",
       "@phpunit"
     ],
-    "serve": "APP_ENV=test php -d variables_order=EGPCS -S localhost:8080 -t public/"
+    "serve": "php -d variables_order=EGPCS -S localhost:8080 -t public/"
   },
   "autoload": {
     "psr-4": {
