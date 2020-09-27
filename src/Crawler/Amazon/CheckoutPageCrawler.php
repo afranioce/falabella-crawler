@@ -4,20 +4,26 @@ declare(strict_types=1);
 
 namespace App\Crawler\Amazon;
 
+use App\Seller\Seller;
 use Crawler\DocumentBuilder;
 use Crawler\Property;
 use Crawler\Type;
+use DateTime;
+use Linio\Component\Database\DatabaseManager;
 
 class CheckoutPageCrawler
 {
+    private DatabaseManager $db;
+
     private DocumentBuilder $documentBuilder;
 
-    public function __construct(DocumentBuilder $documentBuilder)
+    public function __construct(DatabaseManager $databaseManager, DocumentBuilder $documentBuilder)
     {
+        $this->db = $databaseManager;
         $this->documentBuilder = $documentBuilder;
     }
 
-    public function getOfferFreightFromHtml(string $html): void
+    public function getOfferFreightFromHtml(Seller $seller, string $html): void
     {
         $checkoutDocument = $this->documentBuilder->createFromHTML($html);
 
@@ -90,7 +96,7 @@ class CheckoutPageCrawler
 
         $products = $this->transformer($property->getValue());
 
-        $this->save($products);
+        $this->save($seller, $products);
     }
 
     private function transformer(array $orders): array
@@ -105,7 +111,7 @@ class CheckoutPageCrawler
                         'offer' => [
                             'price' => $product['price'],
                             'region' => $item['address'],
-                            'freights' => $order['freights'][$key]['delivery_days'],
+                            'delivery_days' => $order['freights'][$key]['delivery_days'],
                         ],
                     ];
                 }
@@ -115,7 +121,52 @@ class CheckoutPageCrawler
         return $products;
     }
 
-    private function save(array $products): void
+    private function save($seller, array $products): void
     {
+        foreach ($products as $product) {
+            $params = [
+                'name' => $product['name'],
+                'image' => '',
+            ];
+
+            $this->db->execute('
+                INSERT INTO `product` (`name`, `image`)
+                VALUES
+                    (:name, :image)
+            ', $params);
+
+            $productId = $this->db->getLastInsertId();
+
+            $params = [
+                'product_id' => $productId,
+                'seller_id' => $seller->getId(),
+                'name' => $product['name'],
+                'link' => '',
+                'sku' => '',
+                'price' => $product['offer']['price'],
+                'from_price' => '',
+                'is_manually_reviewed' => 0,
+                'created_at' => (new DateTime())->format('Y-m-d H:i:s'),
+            ];
+
+            $this->db->execute('
+                INSERT INTO `offer` (`product_id`, `seller_id`, `name`, `link`, `price`, `from_price`, `sku`, `is_manually_reviewed`, `created_at`)
+                VALUES
+                    (:product_id, :seller_id, :name, :link, :price, :from_price, :sku, :is_manually_reviewed, :created_at)
+            ', $params);
+
+            $offerId = $this->db->getLastInsertId();
+
+            $this->db->execute('
+                INSERT INTO `region` (`offer_id`, `zipcode`, `delivery_days`, `price`)
+                VALUES
+                    (:offer_id, :zipcode, :delivery_days, :price)
+            ', [
+                'offer_id' => $offerId,
+                'zipcode' => $product['offer']['region'],
+                'delivery_days' => $product['offer']['delivery_days'],
+                'price' => $product['offer']['price'],
+            ]);
+        }
     }
 }

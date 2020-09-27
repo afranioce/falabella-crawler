@@ -1,0 +1,4 @@
+amazon_region:
+  path: /amazon/region
+  controller: App\Action\AmazonRegionAction
+  methods: POST
