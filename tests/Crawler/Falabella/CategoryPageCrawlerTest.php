@@ -20,31 +20,21 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 final class CategoryPageCrawlerTest extends TestCase
 {
-    private ObjectProphecy $seller;
-
     private ObjectProphecy $documentBuilder;
 
     private CategoryPageCrawler $categoryPageCrawler;
 
     protected function setUp(): void
     {
-        $this->seller = $this->prophesize(Seller::class);
         $this->documentBuilder = $this->prophesize(DocumentBuilder::class);
 
         $this->categoryPageCrawler = new CategoryPageCrawler(
-            $this->seller->reveal(),
             $this->documentBuilder->reveal(),
         );
     }
 
     public function testGetProductsFromUrl(): void
     {
-        $this->seller
-            ->getHomepage()
-            ->willReturn('http://fake.url')
-            ->shouldBeCalled()
-        ;
-
         $html = file_get_contents(__DIR__.'/../../data/falabella-category.html');
 
         $config = new Configuration([
@@ -61,7 +51,9 @@ final class CategoryPageCrawlerTest extends TestCase
             ->shouldBeCalled()
         ;
 
-        $products = $this->categoryPageCrawler->getProductsFromUrl('foobar');
+        $seller = new Seller(1, 'foobar', 'http://fake.url');
+
+        $products = $this->categoryPageCrawler->getProductsFromUrl($seller, '/foobar');
 
         $expected = [
             new Product(
@@ -73,12 +65,14 @@ final class CategoryPageCrawlerTest extends TestCase
                     new Offer(
                         'Camión Bomberos (Oferta)',
                         'http://fake.url/falabella-cl/product/881631269/Camion-Bomberos',
-                        209.99
+                        209.99,
+                        '881631269'
                     ),
                     new Offer(
                         'Camión Bomberos',
                         'http://fake.url/falabella-cl/product/881631269/Camion-Bomberos',
-                        299.99
+                        299.99,
+                        '881631269'
                     ),
                 ]
             ),
@@ -91,7 +85,8 @@ final class CategoryPageCrawlerTest extends TestCase
                     new Offer(
                         'Auto a Batería BMW Serie 4 6V Rojo',
                         'http://fake.url/falabella-cl/product/880973400/Auto-a-Bateria-BMW-Serie-4-6V-Rojo',
-                        159.99
+                        159.99,
+                    '880973400'
                     ),
                 ]
             ),

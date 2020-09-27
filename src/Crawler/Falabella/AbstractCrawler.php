@@ -6,16 +6,13 @@ namespace App\Crawler\Falabella;
 
 use Crawler\Document;
 use Crawler\DocumentBuilder;
-use GuzzleHttp\ClientInterface;
 
 abstract class AbstractCrawler
 {
     protected DocumentBuilder $documentBuilder;
-    private ClientInterface $client;
 
-    public function __construct(ClientInterface $client, DocumentBuilder $documentBuilder)
+    public function __construct(DocumentBuilder $documentBuilder)
     {
-        $this->client = $client;
         $this->documentBuilder = $documentBuilder;
     }
 
@@ -32,11 +29,6 @@ abstract class AbstractCrawler
 
     protected function getDocument(string $baseUrl, string $path = ''): Document
     {
-//        $response = $this->client->request('GET', sprintf('%s%s', $baseUrl, $path));
-//
-//        $html = $response->getBody()->getContents();
-//        return $this->documentBuilder->createFromHTML($html);
-
         return $this->documentBuilder->createFromURL(sprintf('%s%s', $baseUrl, $path));
     }
 }
